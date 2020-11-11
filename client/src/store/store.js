@@ -101,17 +101,17 @@ export default new Vuex.Store({
             })
             
         },
-        getWill({commit},data){
+        // getWill({commit},data){
             
-            axios.
-            post('http://localhost:3000/user/createWill',{will:data.will},{headers:{Authorization:'Bearer ' +localStorage.getItem("token")}})
-            .then(result =>{
-                console.log(result)
-                let kq = result.data;
-                commit('CREATEWILL',kq.mess);
-            })
-            .catch(err=>console.log(err))
-        },
+        //     axios.
+        //     post('http://localhost:3000/user/createWill',{will:data.will},{headers:{Authorization:'Bearer ' +localStorage.getItem("token")}})
+        //     .then(result =>{
+        //         console.log(result)
+        //         let kq = result.data;
+        //         commit('CREATEWILL',kq.mess);
+        //     })
+        //     .catch(err=>console.log(err))
+        // },
         signUpRela({commit},data){
             axios.
             post('http://localhost:3000/relative/login',data)
@@ -133,16 +133,16 @@ export default new Vuex.Store({
             .catch(err=>console.log(err))
         },
 
-        authRelativeStore({commit,state},data){
+        // authRelativeStore({commit,state},data){
             
-            axios.
-            post('http://localhost:3000/relative/authRelative',{code:data.code},{headers:{Authorization:`Bearer ${state.token1}`}})
-            .then(result =>{
-                let kq = result.data;
-                commit('AUTHRELATIVE',kq.message);
-            })
-            .catch(err=>console.log(err))
-        },
+        //     axios.
+        //     post('http://localhost:3000/relative/authRelative',{code:data.code},{headers:{Authorization:`Bearer ${state.token1}`}})
+        //     .then(result =>{
+        //         let kq = result.data;
+        //         commit('AUTHRELATIVE',kq.message);
+        //     })
+        //     .catch(err=>console.log(err))
+        // },
         logOut({commit}){
             localStorage.removeItem("token");
             commit('LOGOUT')
@@ -171,6 +171,7 @@ export default new Vuex.Store({
             axios.post('http://localhost:3000/user/createWill',{will:data.will},{headers:{Authorization:'Bearer ' +localStorage.getItem("token")}})
             .then(result=>{
                 let message =result.data.message
+                let err =result.data.err
                 if(message =='success'){
                     Swal.fire(
                         'Good job!',
@@ -180,10 +181,17 @@ export default new Vuex.Store({
                       commit('CREATEWILL1','success')
                       
                 }
-                else{
+                else if(err =='forbides'){
                     Swal.fire(
                         'Good job!',
-                        'bạn đã tạo di chúc công, bạn có muốn thanh toán luôn không ?',
+                        'bạn không được phép truy cập',
+                        'error'
+                      )
+                      commit('CREATEWILL1','forbides')
+                }else{
+                    Swal.fire(
+                        'fail rồi nhá',
+                        'tạo lại nha',
                         'error'
                       )
                 }

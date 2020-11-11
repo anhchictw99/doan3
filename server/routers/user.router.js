@@ -9,37 +9,35 @@ const jwt = require("jsonwebtoken");
 var middlewareJwt = require('../middlewares/jwt.middleware')
 router.post('/login',(req,res)=>{
     User.findOne({ username: req.body.username })
-    .exec()
+    
     .then(user =>{
         bcrypt.compare(req.body.password, user.password, (err, result) => {
-            if (err) {
-              return res.status(401).json({
-                message: "Auth failed"
-              });
-            }
             if (result) {
-              const token = jwt.sign(
-                {
-                  name: user.username,
-                  userId: user._id,
-                  role: user.role
-                },
-                process.env.JWT_KEY,
-                {
-                    expiresIn: "1h"
-                }
-              );
-              return res.status(200).json({
-                message: "Auth successful",
-                token: token
-              });
+                const token = jwt.sign(
+                    {
+                      name: user.username,
+                      userId: user._id,
+                      role: user.role
+                    },
+                    process.env.JWT_KEY,
+                    {
+                        expiresIn: "1h"
+                    }
+                  );
+                  return res.status(200).json({
+                    message: "Auth successful",
+                    token: token
+                  });
             }
-            res.status(401).json({
-              message: "Auth failed"
-            });
+            else {
+              return res.status(401).json({err:'loi'})
+            }
+        //    return res.status(401).json({
+        //       message: "Auth failed"
+        //     });
           }); 
     }).catch(err=>{console.log(err);
-        res.status(401).json({err})
+        res.status(401).json({err:'loi'})
     })
 })
 router.post('/register',(req,res)=>{
@@ -68,22 +66,27 @@ router.post('/register',(req,res)=>{
 })
 router.post('/createWill',middlewareJwt,(req,res)=>{
     var item = {will:req.body.will}
-   
-        User.updateOne({_id:req.userData.userId},{$set: item},function(err){
-          if(err){
-            console.log(err);
-            res.status(401).json({err})
-          }
-                
-                res.status(201).json({message:'success'})
-            
-        })
-    
-    
-    
 
-    
-    
+    // User.updateOne({_id:req.userData.userId},{$set: item},function(err){
+    //     if(err){
+    //       console.log(err);
+    //     return  res.status(401).json({err})
+    //     }
+              
+    //     return  res.status(201).json({message:'success'})
+          
+    //   })
+    User.updateOne({_id:req.userData.userId},{$set: item},function(err){
+            if(err){
+              console.log(err);
+            return  res.status(401).json({err})
+            }
+                  
+            return  res.status(201).json({message:'success'})
+              
+          })
+   
+       
 })
 router.get('/showWill',middlewareJwt,(req,res)=>{
     if(req.userData.role=="user" || req.userData.role=="relative"){
